@@ -17,7 +17,7 @@ class FdaCrlSyncJob
 
       records = results.map { |r| map_record(r) }
       existing_numbers = CompleteResponseLetter
-        .where(application_number: records.map { |r| r[:application_number] })
+        .where(application_number: records.flat_map { |r| r[:application_number] }.compact)
         .pluck(:application_number)
         .to_set
 
