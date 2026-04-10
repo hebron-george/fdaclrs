@@ -7,7 +7,7 @@ class FdaCrlSyncJob
     client = OpenFdaApi::Client.new(api_key: ENV["OPEN_FDA_API_KEY"])
     transparency = client.transparency
 
-    new_ids = []
+    new_file_names = []
     skip = 0
 
     loop do
@@ -15,22 +15,25 @@ class FdaCrlSyncJob
       results = response["results"]
       break if results.blank?
 
-      records = results.map { |r| map_record(r) }
-      existing_numbers = CompleteResponseLetter
-        .where(application_number: records.flat_map { |r| r[:application_number] }.compact)
-        .pluck(:application_number)
+      records = results.filter_map { |r| map_record(r) }
+                       .index_by { |r| r[:file_name] }
+                       .values
+
+      existing_file_names = CompleteResponseLetter
+        .where(file_name: records.map { |r| r[:file_name] })
+        .pluck(:file_name)
         .to_set
 
-      new_ids += records
-        .reject { |r| existing_numbers.include?(r[:application_number]) }
-        .map { |r| r[:application_number] }
+      new_file_names += records
+        .reject { |r| existing_file_names.include?(r[:file_name]) }
+        .map { |r| r[:file_name] }
 
       CompleteResponseLetter.upsert_all(
         records,
-        unique_by: :application_number,
+        unique_by: :file_name,
         update_only: %i[
-          letter_type letter_date company_name company_rep company_address
-          approver_name approver_title approver_center file_name text
+          application_numbers letter_type letter_date company_name company_rep
+          company_address approver_name approver_title approver_center text
         ]
       )
 
@@ -40,30 +43,33 @@ class FdaCrlSyncJob
     end
 
     SystemSetting.set("last_crl_sync_at", Time.current.iso8601)
-    Rails.logger.info "[FdaCrlSyncJob] Sync complete. #{new_ids.size} new record(s)."
+    Rails.logger.info "[FdaCrlSyncJob] Sync complete. #{new_file_names.size} new record(s)."
 
-    new_ids
+    new_file_names
   end
 
   private
 
   def map_record(result)
+    file_name = result["file_name"]
+    return nil if file_name.blank?
+
     now = Time.current
 
     {
-      application_number: result["application_number"],
-      letter_type:        result["letter_type"],
-      letter_date:        result["letter_date"],
-      company_name:       result["company_name"],
-      company_rep:        result["company_rep"],
-      company_address:    result["company_address"],
-      approver_name:      result["approver_name"],
-      approver_title:     result["approver_title"],
-      approver_center:    result["approver_center"],
-      file_name:          result["file_name"],
-      text:               result["text"],
-      created_at:         now,
-      updated_at:         now
+      file_name:           file_name,
+      application_numbers: Array(result["application_number"]).compact,
+      letter_type:         result["letter_type"],
+      letter_date:         result["letter_date"],
+      company_name:        result["company_name"],
+      company_rep:         result["company_rep"],
+      company_address:     result["company_address"],
+      approver_name:       result["approver_name"],
+      approver_title:      result["approver_title"],
+      approver_center:     result["approver_center"],
+      text:                result["text"],
+      created_at:          now,
+      updated_at:          now
     }
   end
 end

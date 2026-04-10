@@ -32,7 +32,7 @@ CREATE FUNCTION public.complete_response_letters_search_vector_update() RETURNS 
     AS $$
 BEGIN
   NEW.search_vector :=
-    setweight(to_tsvector('english', coalesce(NEW.application_number, '')), 'A') ||
+    setweight(to_tsvector('english', coalesce(array_to_string(NEW.application_numbers, ' '), '')), 'A') ||
     setweight(to_tsvector('english', coalesce(NEW.company_name, '')), 'A') ||
     setweight(to_tsvector('english', coalesce(NEW.approver_name, '')), 'B') ||
     setweight(to_tsvector('english', coalesce(NEW.approver_center, '')), 'B') ||
@@ -150,7 +150,6 @@ CREATE TABLE public.ar_internal_metadata (
 
 CREATE TABLE public.complete_response_letters (
     id bigint NOT NULL,
-    application_number character varying NOT NULL,
     letter_type character varying,
     letter_date date,
     company_name character varying,
@@ -163,7 +162,8 @@ CREATE TABLE public.complete_response_letters (
     text text,
     search_vector tsvector,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    application_numbers character varying[] DEFAULT '{}'::character varying[]
 );
 
 
@@ -403,10 +403,10 @@ CREATE INDEX index_ahoy_visits_on_visitor_token_and_started_at ON public.ahoy_vi
 
 
 --
--- Name: index_complete_response_letters_on_application_number; Type: INDEX; Schema: public; Owner: -
+-- Name: index_complete_response_letters_on_application_numbers; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_complete_response_letters_on_application_number ON public.complete_response_letters USING btree (application_number);
+CREATE INDEX index_complete_response_letters_on_application_numbers ON public.complete_response_letters USING gin (application_numbers);
 
 
 --
@@ -421,6 +421,13 @@ CREATE INDEX index_complete_response_letters_on_approver_center ON public.comple
 --
 
 CREATE INDEX index_complete_response_letters_on_company_name ON public.complete_response_letters USING btree (company_name);
+
+
+--
+-- Name: index_complete_response_letters_on_file_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_complete_response_letters_on_file_name ON public.complete_response_letters USING btree (file_name);
 
 
 --
@@ -472,6 +479,7 @@ CREATE TRIGGER complete_response_letters_search_vector_trigger BEFORE INSERT OR 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260410203819'),
 ('20260410174845'),
 ('20260410174833'),
 ('20260409142512'),
