@@ -1,10 +1,29 @@
 doctype html
 html
   head
-    title Fdaclrs
+    title FDA Complete Response Letters
     = csrf_meta_tags
     = csp_meta_tag
     = stylesheet_link_tag "application", "data-turbo-track": "reload"
     = javascript_importmap_tags
-  body
-    = yield
+  body.bg-gray-50.min-h-screen.flex.flex-col
+    header.bg-white.border-b.border-gray-200
+      .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
+        .flex.items-center.justify-between.h-16
+          = link_to root_path, class: "flex items-center gap-2" do
+            span.text-lg.font-semibold.text-gray-900 FDA CRL Explorer
+          nav.flex.items-center.gap-4
+            = link_to "Browse Letters", complete_response_letters_path, class: "text-sm text-gray-600 hover:text-gray-900"
+
+    main.flex-1
+      .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-8
+        = yield
+
+    footer.border-t.border-gray-200.bg-white
+      .max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8.py-4
+        - last_sync = SystemSetting.get("last_crl_sync_at")
+        p.text-xs.text-gray-400
+          - if last_sync
+            | Data last updated: #{Time.parse(last_sync).strftime("%B %-d, %Y at %H:%M UTC")}
+          - else
+            | Data not yet synced
