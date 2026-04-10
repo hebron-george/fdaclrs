@@ -1,0 +1,48 @@
+= link_to "← Back to results", complete_response_letters_path, class: "text-sm text-blue-600 hover:underline"
+
+.mt-4.bg-white.rounded-lg.border.border-gray-200.overflow-hidden
+  / Header
+  .px-6.py-5.border-b.border-gray-200.flex.items-start.justify-between.gap-4
+    div
+      h1.text-xl.font-semibold.text-gray-900 = @letter.company_name
+      p.mt-1.text-sm.text-gray-500 = @letter.letter_type
+    - if @letter.file_name.present?
+      = link_to "View PDF →", "https://www.fda.gov/media/#{@letter.file_name.delete_suffix('.pdf')}",
+          target: "_blank", rel: "noopener noreferrer",
+          class: "flex-shrink-0 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+
+  / Metadata grid
+  dl.grid.grid-cols-2.sm:grid-cols-3.gap-px.bg-gray-100.border-b.border-gray-200
+    .bg-white.px-4.py-4
+      dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Letter Date
+      dd.mt-1.text-sm.text-gray-900 = @letter.letter_date&.strftime("%-m/%-d/%Y") || "—"
+    .bg-white.px-4.py-4
+      dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Application #(s)
+      dd.mt-1.text-sm.text-gray-900 = @letter.application_numbers.presence&.join(", ") || "—"
+    .bg-white.px-4.py-4
+      dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide FDA Center
+      dd.mt-1.text-sm.text-gray-900 = @letter.approver_center.presence || "—"
+    .bg-white.px-4.py-4
+      dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Approver
+      dd.mt-1.text-sm.text-gray-900 = @letter.approver_name.presence || "—"
+    .bg-white.px-4.py-4
+      dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Approver Title
+      dd.mt-1.text-sm.text-gray-900 = @letter.approver_title.presence || "—"
+    .bg-white.px-4.py-4
+      dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Company Rep
+      dd.mt-1.text-sm.text-gray-900 = @letter.company_rep.presence || "—"
+
+  / Company address
+  - if @letter.company_address.present?
+    .px-6.py-4.border-b.border-gray-200
+      p.text-xs.font-medium.text-gray-500.uppercase.tracking-wide.mb-1 Company Address
+      p.text-sm.text-gray-700.whitespace-pre-line = @letter.company_address
+
+  / Full letter text
+  .px-6.py-5
+    h2.text-sm.font-semibold.text-gray-700.uppercase.tracking-wide.mb-3 Letter Text
+    - if @letter.text.present?
+      .max-h-96.overflow-y-auto.border.border-gray-100.rounded.p-4.bg-gray-50
+        p.text-sm.text-gray-800.whitespace-pre-wrap = @letter.text
+    - else
+      p.text-sm.text-gray-400.italic Full text not available
