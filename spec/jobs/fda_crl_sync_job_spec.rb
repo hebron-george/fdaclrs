@@ -20,7 +20,8 @@ RSpec.describe FdaCrlSyncJob, type: :job do
   subject(:job) { described_class.new }
 
   describe "#perform" do
-    it "inserts records from the API response" do
+    it "inserts only records that have a file_name" do
+      # fixture has 2 results: one with file_name, one without
       expect { job.perform }.to change(CompleteResponseLetter, :count).by(1)
     end
 
@@ -29,9 +30,9 @@ RSpec.describe FdaCrlSyncJob, type: :job do
       expect(SystemSetting.get("last_crl_sync_at")).not_to be_nil
     end
 
-    it "returns the application numbers of newly inserted records" do
+    it "returns the file_names of newly inserted records" do
       new_ids = job.perform
-      expect(new_ids).to include("NDA012345")
+      expect(new_ids).to eq(["example_crl.pdf"])
     end
 
     it "does not duplicate records on re-run" do
@@ -39,9 +40,15 @@ RSpec.describe FdaCrlSyncJob, type: :job do
       expect { job.perform }.not_to change(CompleteResponseLetter, :count)
     end
 
+    it "stores application_number as an array" do
+      job.perform
+      letter = CompleteResponseLetter.find_by(file_name: "example_crl.pdf")
+      expect(letter.application_numbers).to eq(["NDA012345", "NDA012345/S-001"])
+    end
+
     it "maps all expected fields" do
       job.perform
-      letter = CompleteResponseLetter.find_by(application_number: "NDA012345")
+      letter = CompleteResponseLetter.find_by(file_name: "example_crl.pdf")
       expect(letter.company_name).to eq("Example Pharmaceuticals Inc.")
       expect(letter.approver_center).to eq("Center for Drug Evaluation and Research")
       expect(letter.letter_date).to eq(Date.new(2023, 6, 15))

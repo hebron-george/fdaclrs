@@ -6,14 +6,14 @@
     "last_updated": "2024-01-01",
     "results": {
       "skip": 0,
-      "limit": 1,
-      "total": 100
+      "limit": 2,
+      "total": 2
     }
   },
   "results": [
     {
       "file_name": "example_crl.pdf",
-      "application_number": "NDA012345",
+      "application_number": ["NDA012345", "NDA012345/S-001"],
       "letter_type": "COMPLETE RESPONSE",
       "letter_date": "2023-06-15",
       "company_name": "Example Pharmaceuticals Inc.",
@@ -23,6 +23,19 @@
       "approver_title": "Acting Deputy Director",
       "approver_center": "Center for Drug Evaluation and Research",
       "text": "We have completed our review of this application and have determined that we cannot approve this application in its present form."
+    },
+    {
+      "file_name": null,
+      "application_number": null,
+      "letter_type": "COMPLETE RESPONSE",
+      "letter_date": "2023-07-01",
+      "company_name": "Missing File Corp",
+      "company_rep": null,
+      "company_address": null,
+      "approver_name": null,
+      "approver_title": null,
+      "approver_center": null,
+      "text": null
     }
   ]
 }
