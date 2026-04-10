@@ -1,0 +1,5 @@
+fda_crl_sync:
+  cron: "0 6 * * *"
+  class: "FdaCrlSyncJob"
+  queue: default
+  description: "Daily sync of FDA Complete Response Letters"
