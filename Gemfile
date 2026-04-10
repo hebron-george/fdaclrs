@@ -71,6 +71,7 @@ gem "sidekiq-cron"
 gem "sidekiq-failures"
 gem "pry-rails"
 gem "awesome_print"
+gem "open_fda_api", github: "hebron-george/open_fda_api"
 
 group :development, :test do
   gem "rspec-rails"

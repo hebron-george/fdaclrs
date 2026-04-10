@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_09_142512) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_10_174845) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,6 +55,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_142512) do
     t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
     t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
     t.index ["visitor_token", "started_at"], name: "index_ahoy_visits_on_visitor_token_and_started_at"
+  end
+
+  create_table "complete_response_letters", force: :cascade do |t|
+    t.string "application_number", null: false
+    t.string "approver_center"
+    t.string "approver_name"
+    t.string "approver_title"
+    t.text "company_address"
+    t.string "company_name"
+    t.string "company_rep"
+    t.datetime "created_at", null: false
+    t.string "file_name"
+    t.date "letter_date"
+    t.string "letter_type"
+    t.tsvector "search_vector"
+    t.text "text"
+    t.datetime "updated_at", null: false
+    t.index ["application_number"], name: "index_complete_response_letters_on_application_number", unique: true
+    t.index ["approver_center"], name: "index_complete_response_letters_on_approver_center"
+    t.index ["company_name"], name: "index_complete_response_letters_on_company_name"
+    t.index ["letter_date"], name: "index_complete_response_letters_on_letter_date"
+    t.index ["search_vector"], name: "index_complete_response_letters_on_search_vector", using: :gin
+  end
+
+  create_table "system_settings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.datetime "updated_at", null: false
+    t.text "value"
+    t.index ["key"], name: "index_system_settings_on_key", unique: true
   end
 
   create_table "users", force: :cascade do |t|

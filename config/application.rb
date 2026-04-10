@@ -38,5 +38,8 @@ module Fdaclrs
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # Use structure.sql to preserve DB triggers, functions, and other raw SQL
+    config.active_record.schema_format = :sql
   end
 end
