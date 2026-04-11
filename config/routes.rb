@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   devise_for :users
 
   resources :complete_response_letters, only: [:index, :show]
+  resources :subscriptions, only: [:index, :create, :destroy]
+  get "/unsubscribe/:token", to: "subscriptions#unsubscribe", as: :unsubscribe
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

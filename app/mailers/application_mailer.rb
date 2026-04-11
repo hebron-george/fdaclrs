@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
+  default from: -> { ENV["MAILER_FROM"].presence || "FDA CRL Explorer <noreply@fdaclrs.example.com>" }
   layout "mailer"
 end

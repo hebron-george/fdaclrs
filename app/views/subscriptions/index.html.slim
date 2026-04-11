@@ -1,0 +1,35 @@
+.flex.items-center.justify-between.mb-6
+  h1.text-xl.font-semibold.text-gray-900 My Subscriptions
+  = link_to "← Browse Letters", complete_response_letters_path, class: "text-sm text-blue-600 hover:underline"
+
+- if @subscriptions.any?
+  .bg-white.rounded-lg.border.border-gray-200.overflow-hidden
+    ul.divide-y.divide-gray-100
+      - @subscriptions.each do |sub|
+        li.px-5.py-4.flex.items-start.justify-between.gap-4
+          .min-w-0
+            .flex.items-center.gap-2.mb-1
+              p.text-sm.font-medium.text-gray-900 = sub.name
+              - unless sub.active?
+                span.inline-flex.items-center.rounded-full.px-2.py-0.5.text-xs.font-medium.bg-gray-100.text-gray-500 Paused
+            - filters = sub.filters.reject { |_, v| v.blank? }
+            - if filters.any?
+              .flex.flex-wrap.gap-x-4.gap-y-1
+                - filters.each do |key, val|
+                  span.text-xs.text-gray-500
+                    span.font-medium = key.humanize
+                    |: #{val}
+            - else
+              p.text-xs.text-gray-400.italic All letters
+          = button_to subscription_path(sub), method: :delete,
+              class: "flex-shrink-0 text-sm text-red-500 hover:text-red-700",
+              form: { data: { turbo_confirm: "Remove \"#{sub.name}\"?" } } do
+            | Remove
+
+- else
+  .bg-white.rounded-lg.border.border-gray-200.p-10.text-center
+    p.text-gray-500.font-medium No subscriptions yet
+    p.text-sm.text-gray-400.mt-1
+      | Go to
+      = link_to " Browse Letters", complete_response_letters_path, class: "text-blue-600 hover:underline"
+      | , set up your filters, and click "Save this search".

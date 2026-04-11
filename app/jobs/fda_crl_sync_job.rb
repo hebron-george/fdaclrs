@@ -45,6 +45,8 @@ class FdaCrlSyncJob
     SystemSetting.set("last_crl_sync_at", Time.current.iso8601)
     Rails.logger.info "[FdaCrlSyncJob] Sync complete. #{new_file_names.size} new record(s)."
 
+    NewCrlNotificationJob.perform_async(new_file_names) if new_file_names.any?
+
     new_file_names
   end
 

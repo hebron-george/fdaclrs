@@ -1,0 +1,37 @@
+p
+  | Hi #{@user.email},
+
+p
+  | A new FDA Complete Response Letter matches your saved search
+  strong  "#{@subscription.name}"
+
+table style="width:100%;border-collapse:collapse;margin:16px 0"
+  tbody
+    tr
+      td style="padding:6px 0;color:#6b7280;font-size:13px;width:140px" Company
+      td style="padding:6px 0;font-size:13px"
+        strong = @letter.company_name
+    tr
+      td style="padding:6px 0;color:#6b7280;font-size:13px" Application #(s)
+      td style="padding:6px 0;font-size:13px;font-family:monospace" = @letter.application_numbers.join(", ").presence || "—"
+    tr
+      td style="padding:6px 0;color:#6b7280;font-size:13px" Letter Date
+      td style="padding:6px 0;font-size:13px" = @letter.letter_date&.strftime("%-m/%-d/%Y") || "—"
+    tr
+      td style="padding:6px 0;color:#6b7280;font-size:13px" FDA Center
+      td style="padding:6px 0;font-size:13px" = @letter.approver_center.join(", ").presence || "—"
+    tr
+      td style="padding:6px 0;color:#6b7280;font-size:13px" Approver
+      td style="padding:6px 0;font-size:13px" = @letter.approver_name.presence || "—"
+
+p
+  = link_to "View Full Letter →", complete_response_letter_url(@letter),
+      style: "display:inline-block;background:#2563eb;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-size:14px"
+
+hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0"
+
+p style="font-size:12px;color:#9ca3af"
+  | You're receiving this because of your saved search on FDA CRL Explorer.
+  |
+  = link_to "Unsubscribe", @unsubscribe_url, style: "color:#9ca3af"
+  |  to stop receiving these emails.
