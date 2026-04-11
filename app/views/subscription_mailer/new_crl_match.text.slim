@@ -1,0 +1,19 @@
+| Hi #{@user.email},
+= "\n\n"
+| A new FDA Complete Response Letter matches your saved search "#{@subscription.name}":
+= "\n\n"
+| Company:       #{@letter.company_name}
+= "\n"
+| Application #: #{@letter.application_numbers.join(", ").presence || "—"}
+= "\n"
+| Letter Date:   #{@letter.letter_date&.strftime("%-m/%-d/%Y") || "—"}
+= "\n"
+| FDA Center:    #{@letter.approver_center.join(", ").presence || "—"}
+= "\n"
+| Approver:      #{@letter.approver_name.presence || "—"}
+= "\n\n"
+| View full letter: #{complete_response_letter_url(@letter)}
+= "\n\n"
+| ---
+= "\n"
+| To unsubscribe: #{@unsubscribe_url}
