@@ -8,7 +8,7 @@ RSpec.describe CompleteResponseLetter, type: :model do
       letter_type:         "COMPLETE RESPONSE",
       letter_date:         Date.new(2023, 6, 15),
       company_name:        "Example Therapeutics",
-      approver_center:     "Center for Biologics Evaluation and Research",
+      approver_center:     ["Center for Biologics Evaluation and Research"],
       text:                "We cannot approve this application in its present form."
     }
     CompleteResponseLetter.create!(defaults.merge(attrs))
@@ -76,8 +76,8 @@ RSpec.describe CompleteResponseLetter, type: :model do
 
   describe ".by_center scope" do
     it "filters by approver_center" do
-      build_letter(file_name: "cber.pdf", approver_center: "Center for Biologics Evaluation and Research")
-      build_letter(file_name: "cder.pdf", approver_center: "Center for Drug Evaluation and Research")
+      build_letter(file_name: "cber.pdf", approver_center: ["Center for Biologics Evaluation and Research"])
+      build_letter(file_name: "cder.pdf", approver_center: ["Center for Drug Evaluation and Research"])
 
       results = CompleteResponseLetter.by_center("Center for Biologics Evaluation and Research")
       expect(results.map(&:file_name)).to eq(["cber.pdf"])

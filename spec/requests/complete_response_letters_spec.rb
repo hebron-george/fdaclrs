@@ -8,7 +8,7 @@ RSpec.describe "CompleteResponseLetters", type: :request do
       letter_type:         "COMPLETE RESPONSE",
       letter_date:         Date.new(2023, 6, 15),
       company_name:        "Example Therapeutics",
-      approver_center:     "Center for Biologics Evaluation and Research",
+      approver_center:     ["Center for Biologics Evaluation and Research"],
       approver_name:       "Dr. Jane Smith",
       text:                "We cannot approve this application in its present form."
     }
@@ -22,8 +22,8 @@ RSpec.describe "CompleteResponseLetters", type: :request do
     end
 
     it "defaults to filtering by CBER" do
-      create_letter(company_name: "CBER Therapeutics",  approver_center: "Center for Biologics Evaluation and Research")
-      create_letter(company_name: "CDER Pharmaceuticals", approver_center: "Center for Drug Evaluation and Research")
+      create_letter(company_name: "CBER Therapeutics",  approver_center: ["Center for Biologics Evaluation and Research"])
+      create_letter(company_name: "CDER Pharmaceuticals", approver_center: ["Center for Drug Evaluation and Research"])
 
       get complete_response_letters_path
       expect(response.body).to include("CBER Therapeutics")
@@ -31,8 +31,8 @@ RSpec.describe "CompleteResponseLetters", type: :request do
     end
 
     it "shows all centers when center param is blank" do
-      create_letter(company_name: "CBER Therapeutics",  approver_center: "Center for Biologics Evaluation and Research")
-      create_letter(company_name: "CDER Pharmaceuticals", approver_center: "Center for Drug Evaluation and Research")
+      create_letter(company_name: "CBER Therapeutics",  approver_center: ["Center for Biologics Evaluation and Research"])
+      create_letter(company_name: "CDER Pharmaceuticals", approver_center: ["Center for Drug Evaluation and Research"])
 
       get complete_response_letters_path, params: { center: "" }
       expect(response.body).to include("CBER Therapeutics")
@@ -40,8 +40,8 @@ RSpec.describe "CompleteResponseLetters", type: :request do
     end
 
     it "filters by company name" do
-      create_letter(company_name: "BlueBird Bio",  approver_center: "Center for Biologics Evaluation and Research")
-      create_letter(company_name: "Pharma Corp", approver_center: "Center for Biologics Evaluation and Research")
+      create_letter(company_name: "BlueBird Bio",  approver_center: ["Center for Biologics Evaluation and Research"])
+      create_letter(company_name: "Pharma Corp", approver_center: ["Center for Biologics Evaluation and Research"])
 
       get complete_response_letters_path, params: { company: "bluebird", center: "" }
       expect(response.body).to include("BlueBird Bio")

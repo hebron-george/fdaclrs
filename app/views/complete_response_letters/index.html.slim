@@ -56,7 +56,26 @@
             | No results
 
       - if @letters.any?
-        .bg-white.rounded-lg.border.border-gray-200.overflow-hidden
+        / — Mobile card list (hidden on md+) —
+        .space-y-3.md:hidden
+          - @letters.each do |letter|
+            = link_to complete_response_letter_path(letter), class: "block bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-shadow" do
+              .flex.items-start.justify-between.gap-2.mb-2
+                .flex-1.min-w-0
+                  p.text-sm.font-medium.text-gray-900.truncate = letter.company_name
+                  p.text-xs.text-gray-500.mt-0.5 = letter.letter_date&.strftime("%-m/%-d/%Y")
+              - if letter.approver_center.any?
+                .flex.flex-wrap.gap-1.mb-2
+                  = center_badges(letter.approver_center)
+              - if letter.application_numbers.any?
+                .flex.flex-wrap.gap-1.mb-2
+                  - letter.application_numbers.each do |num|
+                    span.inline-block.font-mono.text-xs.text-blue-700.bg-blue-50.rounded.px-1.5.py-0.5 = num
+              - if @headlines&.key?(letter.id)
+                p.text-xs.text-gray-500.italic.line-clamp-2 = raw @headlines[letter.id]
+
+        / — Desktop table (hidden below md) —
+        .hidden.md:block.bg-white.rounded-lg.border.border-gray-200.overflow-hidden
           .overflow-x-auto
             table.min-w-full.divide-y.divide-gray-200
               thead.bg-gray-50
@@ -64,7 +83,7 @@
                   th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Date
                   th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Application #(s)
                   th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Company
-                  th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.hidden.md:table-cell Center
+                  th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Center
                   th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.hidden.lg:table-cell Approver
               tbody.divide-y.divide-gray-100
                 - @letters.each do |letter|
@@ -78,9 +97,9 @@
                           span.block.font-mono.text-xs.text-blue-700 = num
                     td.px-4.py-3.text-sm.text-gray-900
                       = link_to letter.company_name, complete_response_letter_path(letter), class: "hover:underline"
-                    td.px-4.py-3.text-sm.text-gray-600.hidden.md:table-cell
+                    td.px-4.py-3.text-sm
                       = link_to complete_response_letter_path(letter), class: "block" do
-                        = letter.approver_center
+                        = center_badges(letter.approver_center)
                     td.px-4.py-3.text-sm.text-gray-600.hidden.lg:table-cell
                       = link_to complete_response_letter_path(letter), class: "block" do
                         = letter.approver_name

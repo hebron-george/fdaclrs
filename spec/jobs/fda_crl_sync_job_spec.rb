@@ -50,7 +50,7 @@ RSpec.describe FdaCrlSyncJob, type: :job do
       job.perform
       letter = CompleteResponseLetter.find_by(file_name: "example_crl.pdf")
       expect(letter.company_name).to eq("Example Pharmaceuticals Inc.")
-      expect(letter.approver_center).to eq("Center for Drug Evaluation and Research")
+      expect(letter.approver_center).to eq(["Center for Drug Evaluation and Research"])
       expect(letter.letter_date).to eq(Date.new(2023, 6, 15))
     end
   end

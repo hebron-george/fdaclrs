@@ -1,1 +1,56 @@
-h1 Welcome to Fdaclrs
+/ Hero
+.text-center.py-10.sm:py-14
+  h1.text-3xl.sm:text-4xl.font-bold.text-gray-900 FDA Complete Response Letter Explorer
+  p.mt-3.text-base.sm:text-lg.text-gray-500.max-w-2xl.mx-auto
+    | Search and monitor Complete Response Letters issued by the FDA. Built for regulatory affairs
+    |  teams focused on gene therapy and biologics.
+  .mt-6
+    = link_to "Browse Letters →", complete_response_letters_path,
+        class: "inline-flex items-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+
+/ Stats row
+- if @total_letters > 0
+  .mt-10.grid.grid-cols-1.sm:grid-cols-3.gap-4
+    .bg-white.rounded-lg.border.border-gray-200.p-5.text-center
+      p.text-3xl.font-bold.text-gray-900 = number_with_delimiter(@total_letters)
+      p.mt-1.text-sm.text-gray-500 Letters indexed
+    .bg-white.rounded-lg.border.border-gray-200.p-5.text-center
+      p.text-3xl.font-bold.text-gray-900
+        - if @most_recent_date
+          = @most_recent_date.strftime("%-m/%-d/%Y")
+        - else
+          | —
+      p.mt-1.text-sm.text-gray-500 Most recent letter
+    .bg-white.rounded-lg.border.border-gray-200.p-5.text-center
+      p.text-3xl.font-bold.text-gray-900 = @letters_by_center.size
+      p.mt-1.text-sm.text-gray-500 FDA centers represented
+
+  / By-center breakdown
+  - if @letters_by_center.any?
+    .mt-6.bg-white.rounded-lg.border.border-gray-200.overflow-hidden
+      .px-5.py-3.border-b.border-gray-100
+        h2.text-sm.font-semibold.text-gray-700 Letters by Center
+      ul.divide-y.divide-gray-100
+        - @letters_by_center.each do |center, count|
+          li.px-5.py-3.flex.items-center.justify-between.gap-4
+            .flex.items-center.gap-2.min-w-0
+              = center_badge(center)
+              span.text-sm.text-gray-600.truncate = center
+            = link_to number_with_delimiter(count),
+                complete_response_letters_path(center: center),
+                class: "text-sm font-medium text-blue-600 hover:underline flex-shrink-0"
+
+/ What is a CRL?
+.mt-10.bg-white.rounded-lg.border.border-gray-200.p-6
+  h2.text-sm.font-semibold.text-gray-700.uppercase.tracking-wide.mb-3 What is a Complete Response Letter?
+  .space-y-3.text-sm.text-gray-600
+    p
+      | A <strong>Complete Response Letter (CRL)</strong> is an FDA communication informing an applicant
+      |  that their New Drug Application (NDA) or Biologics License Application (BLA) cannot be approved
+      |  in its current form. It details the deficiencies that must be addressed before approval can proceed.
+    p
+      | CRLs are publicly released by the FDA and serve as an important signal for regulatory strategy teams,
+      |  investors, and clinicians tracking the approval landscape for specific therapeutic areas.
+  .mt-4
+    = link_to "Browse all letters →", complete_response_letters_path,
+        class: "text-sm text-blue-600 hover:underline"

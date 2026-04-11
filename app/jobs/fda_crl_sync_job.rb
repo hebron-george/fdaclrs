@@ -66,7 +66,7 @@ class FdaCrlSyncJob
       company_address:     result["company_address"],
       approver_name:       result["approver_name"],
       approver_title:      result["approver_title"],
-      approver_center:     result["approver_center"],
+      approver_center:     Array(result["approver_center"]).compact,
       text:                result["text"],
       created_at:          now,
       updated_at:          now
