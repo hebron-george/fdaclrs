@@ -8,7 +8,7 @@
         h1.text-xl.font-semibold.text-gray-900 = @letter.company_name
         p.mt-1.text-sm.text-gray-500 = @letter.letter_type
       - if @letter.file_name.present?
-        = link_to "View PDF →", "https://www.fda.gov/media/#{@letter.file_name.delete_suffix('.pdf')}",
+        = link_to "View PDF →", "https://download.open.fda.gov/crl/#{@letter.file_name}",
             target: "_blank", rel: "noopener noreferrer",
             class: "self-start sm:flex-shrink-0 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
 
@@ -22,7 +22,12 @@
       dd.mt-1.text-sm.text-gray-900.font-mono = @letter.application_numbers.presence&.join(", ") || "—"
     .bg-white.px-4.py-4
       dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide FDA Center
-      dd.mt-1.text-sm.text-gray-900 = @letter.approver_center.presence || "—"
+      dd.mt-1
+        - if @letter.approver_center.any?
+          .flex.flex-wrap.gap-1
+            = center_badges(@letter.approver_center)
+        - else
+          span.text-sm.text-gray-900 —
     .bg-white.px-4.py-4
       dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Approver
       dd.mt-1.text-sm.text-gray-900 = @letter.approver_name.presence || "—"

@@ -35,7 +35,7 @@ BEGIN
     setweight(to_tsvector('english', coalesce(array_to_string(NEW.application_numbers, ' '), '')), 'A') ||
     setweight(to_tsvector('english', coalesce(NEW.company_name, '')), 'A') ||
     setweight(to_tsvector('english', coalesce(NEW.approver_name, '')), 'B') ||
-    setweight(to_tsvector('english', coalesce(NEW.approver_center, '')), 'B') ||
+    setweight(to_tsvector('english', coalesce(array_to_string(NEW.approver_center, ' '), '')), 'B') ||
     setweight(to_tsvector('english', coalesce(NEW.text, '')), 'C');
   RETURN NEW;
 END
@@ -157,13 +157,13 @@ CREATE TABLE public.complete_response_letters (
     company_address text,
     approver_name character varying,
     approver_title character varying,
-    approver_center character varying,
     file_name character varying,
     text text,
     search_vector tsvector,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    application_numbers character varying[] DEFAULT '{}'::character varying[]
+    application_numbers character varying[] DEFAULT '{}'::character varying[],
+    approver_center character varying[] DEFAULT '{}'::character varying[]
 );
 
 
@@ -413,7 +413,7 @@ CREATE INDEX index_complete_response_letters_on_application_numbers ON public.co
 -- Name: index_complete_response_letters_on_approver_center; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_complete_response_letters_on_approver_center ON public.complete_response_letters USING btree (approver_center);
+CREATE INDEX index_complete_response_letters_on_approver_center ON public.complete_response_letters USING gin (approver_center);
 
 
 --
@@ -479,6 +479,7 @@ CREATE TRIGGER complete_response_letters_search_vector_trigger BEFORE INSERT OR 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260411044320'),
 ('20260410203819'),
 ('20260410174845'),
 ('20260410174833'),

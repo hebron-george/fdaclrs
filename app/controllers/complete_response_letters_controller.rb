@@ -2,7 +2,9 @@ class CompleteResponseLettersController < ApplicationController
   CBER = "Center for Biologics Evaluation and Research"
 
   def index
-    @centers = CompleteResponseLetter.distinct.order(:approver_center).pluck(:approver_center).compact
+    @centers = CompleteResponseLetter
+                 .pluck(Arel.sql("unnest(approver_center)"))
+                 .uniq.compact.sort
 
     # Default center to CBER on first load (no params at all)
     @selected_center = params.key?(:q) || params.key?(:center) ? params[:center] : CBER
