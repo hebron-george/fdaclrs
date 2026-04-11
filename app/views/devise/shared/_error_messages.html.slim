@@ -1,0 +1,12 @@
+- if resource.errors.any?
+  .rounded-md.bg-red-50.border.border-red-200.p-4.mb-5
+    .flex.gap-3
+      .flex-shrink-0
+        svg.h-5.w-5.text-red-400 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+          path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"
+      div
+        h3.text-sm.font-medium.text-red-800
+          = "#{resource.errors.count} error#{"s" if resource.errors.count > 1} prevented this from saving:"
+        ul.mt-2.text-sm.text-red-700.list-disc.list-inside.space-y-1
+          - resource.errors.full_messages.each do |msg|
+            li = msg
