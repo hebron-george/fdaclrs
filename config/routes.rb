@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   require "sidekiq/web"
   mount Sidekiq::Web => "/sidekiq"
     
-  devise_for :users
+  devise_for :users, controllers: { registrations: "users/registrations" }
 
   resources :complete_response_letters, only: [:index, :show]
   resources :subscriptions, only: [:index, :create, :destroy]
