@@ -77,3 +77,9 @@ gem "pagy"
 group :development, :test do
   gem "rspec-rails"
 end
+
+group :test do
+  gem "capybara"
+  gem "selenium-webdriver"
+  gem "database_cleaner-active_record"
+end
