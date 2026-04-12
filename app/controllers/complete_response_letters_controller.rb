@@ -40,6 +40,6 @@ class CompleteResponseLettersController < ApplicationController
   end
 
   def show
-    @letter = CompleteResponseLetter.find(params[:id])
+    @letter = CompleteResponseLetter.includes(:letter_corrections).find(params[:id])
   end
 end

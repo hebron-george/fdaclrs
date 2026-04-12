@@ -38,4 +38,20 @@ module ApplicationHelper
 
     safe_join(centers.map { |c| center_badge(c) }, " ".html_safe)
   end
+
+  # Renders an amber "corrected" badge for a field that has been manually
+  # overridden by an admin. The title tooltip shows the original API value
+  # so users know what the source data actually said.
+  def correction_badge(letter, field)
+    return "".html_safe unless letter.corrected?(field)
+
+    original = letter.api_original(field)
+    original_label = original.present? ? original : "not provided by API"
+
+    content_tag(:span, "corrected",
+      class: "ml-1.5 inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-medium " \
+             "bg-amber-100 text-amber-700 border border-amber-200 cursor-default",
+      title: "Manually corrected. Original API value: #{original_label}"
+    )
+  end
 end

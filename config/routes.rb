@@ -11,6 +11,10 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { registrations: "users/registrations" }
 
   resources :complete_response_letters, only: [:index, :show]
+
+  namespace :admin do
+    resources :complete_response_letters, only: [:index, :edit, :update], path: "letters"
+  end
   resources :subscriptions, only: [:index, :create, :destroy]
   get "/unsubscribe/:token", to: "subscriptions#unsubscribe", as: :unsubscribe
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
