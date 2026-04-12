@@ -16,27 +16,38 @@
   dl.grid.grid-cols-1.sm:grid-cols-2.lg:grid-cols-3.gap-px.bg-gray-100.border-b.border-gray-200
     .bg-white.px-4.py-4
       dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Letter Date
-      dd.mt-1.text-sm.text-gray-900 = @letter.letter_date&.strftime("%-m/%-d/%Y") || "—"
+      dd.mt-1.flex.items-center.flex-wrap.gap-1
+        span.text-sm.text-gray-900 = @letter.letter_date&.strftime("%-m/%-d/%Y") || "—"
+        = correction_badge(@letter, :letter_date)
     .bg-white.px-4.py-4
       dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Application #(s)
-      dd.mt-1.text-sm.text-gray-900.font-mono = @letter.application_numbers.presence&.join(", ") || "—"
+      dd.mt-1.flex.items-center.flex-wrap.gap-1
+        span.text-sm.text-gray-900.font-mono = @letter.application_numbers.presence&.join(", ") || "—"
+        = correction_badge(@letter, :application_numbers)
     .bg-white.px-4.py-4
       dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide FDA Center
       dd.mt-1
-        - if @letter.approver_center.any?
-          .flex.flex-wrap.gap-1
+        .flex.items-center.flex-wrap.gap-1
+          - if @letter.approver_center.any?
             = center_badges(@letter.approver_center)
-        - else
-          span.text-sm.text-gray-900 —
+          - else
+            span.text-sm.text-gray-900 —
+          = correction_badge(@letter, :approver_center)
     .bg-white.px-4.py-4
       dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Approver
-      dd.mt-1.text-sm.text-gray-900 = @letter.approver_name.presence || "—"
+      dd.mt-1.flex.items-center.flex-wrap.gap-1
+        span.text-sm.text-gray-900 = @letter.approver_name.presence || "—"
+        = correction_badge(@letter, :approver_name)
     .bg-white.px-4.py-4
       dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Approver Title
-      dd.mt-1.text-sm.text-gray-900 = @letter.approver_title.presence || "—"
+      dd.mt-1.flex.items-center.flex-wrap.gap-1
+        span.text-sm.text-gray-900 = @letter.approver_title.presence || "—"
+        = correction_badge(@letter, :approver_title)
     .bg-white.px-4.py-4
       dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Company Rep
-      dd.mt-1.text-sm.text-gray-900 = @letter.company_rep.presence || "—"
+      dd.mt-1.flex.items-center.flex-wrap.gap-1
+        span.text-sm.text-gray-900 = @letter.company_rep.presence || "—"
+        = correction_badge(@letter, :company_rep)
 
   / Company address
   - if @letter.company_address.present?

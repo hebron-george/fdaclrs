@@ -187,6 +187,42 @@ ALTER SEQUENCE public.complete_response_letters_id_seq OWNED BY public.complete_
 
 
 --
+-- Name: letter_corrections; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.letter_corrections (
+    id bigint NOT NULL,
+    complete_response_letter_id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    field_name character varying NOT NULL,
+    original_value text,
+    corrected_value text NOT NULL,
+    note text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: letter_corrections_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.letter_corrections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: letter_corrections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.letter_corrections_id_seq OWNED BY public.letter_corrections.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -274,7 +310,8 @@ CREATE TABLE public.users (
     reset_password_sent_at timestamp(6) without time zone,
     remember_created_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    admin boolean DEFAULT false NOT NULL
 );
 
 
@@ -316,6 +353,13 @@ ALTER TABLE ONLY public.ahoy_visits ALTER COLUMN id SET DEFAULT nextval('public.
 --
 
 ALTER TABLE ONLY public.complete_response_letters ALTER COLUMN id SET DEFAULT nextval('public.complete_response_letters_id_seq'::regclass);
+
+
+--
+-- Name: letter_corrections id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.letter_corrections ALTER COLUMN id SET DEFAULT nextval('public.letter_corrections_id_seq'::regclass);
 
 
 --
@@ -369,6 +413,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.complete_response_letters
     ADD CONSTRAINT complete_response_letters_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: letter_corrections letter_corrections_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.letter_corrections
+    ADD CONSTRAINT letter_corrections_pkey PRIMARY KEY (id);
 
 
 --
@@ -495,6 +547,27 @@ CREATE INDEX index_complete_response_letters_on_search_vector ON public.complete
 
 
 --
+-- Name: index_letter_corrections_on_complete_response_letter_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_letter_corrections_on_complete_response_letter_id ON public.letter_corrections USING btree (complete_response_letter_id);
+
+
+--
+-- Name: index_letter_corrections_on_letter_and_field; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_letter_corrections_on_letter_and_field ON public.letter_corrections USING btree (complete_response_letter_id, field_name);
+
+
+--
+-- Name: index_letter_corrections_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_letter_corrections_on_user_id ON public.letter_corrections USING btree (user_id);
+
+
+--
 -- Name: index_subscriptions_on_unsubscribe_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -544,6 +617,22 @@ CREATE TRIGGER complete_response_letters_search_vector_trigger BEFORE INSERT OR 
 
 
 --
+-- Name: letter_corrections fk_rails_04b28ed2d5; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.letter_corrections
+    ADD CONSTRAINT fk_rails_04b28ed2d5 FOREIGN KEY (complete_response_letter_id) REFERENCES public.complete_response_letters(id);
+
+
+--
+-- Name: letter_corrections fk_rails_1e7a76cda3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.letter_corrections
+    ADD CONSTRAINT fk_rails_1e7a76cda3 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: subscriptions fk_rails_933bdff476; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -558,6 +647,8 @@ ALTER TABLE ONLY public.subscriptions
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260411200002'),
+('20260411200001'),
 ('20260411133415'),
 ('20260411133414'),
 ('20260411044320'),

@@ -5,4 +5,5 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_many :subscriptions, dependent: :destroy
+  has_many :letter_corrections, dependent: :nullify
 end

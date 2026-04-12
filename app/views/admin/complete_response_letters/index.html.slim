@@ -1,0 +1,37 @@
+.flex.flex-wrap.items-center.justify-between.gap-2.mb-6
+  h1.text-xl.font-semibold.text-gray-900 Data Quality — Letter Corrections
+  p.text-sm.text-gray-500 Edit a letter to fill in missing or incorrect fields from the API response.
+
+.bg-white.rounded-lg.border.border-gray-200.overflow-hidden
+  .overflow-x-auto
+    table.min-w-full.divide-y.divide-gray-200
+      thead.bg-gray-50
+        tr
+          th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Date
+          th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Application #(s)
+          th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Company
+          th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Center
+          th.px-4.py-3.text-left.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Corrections
+          th.px-4.py-3
+      tbody.divide-y.divide-gray-100
+        - @letters.each do |letter|
+          tr.hover:bg-gray-50
+            td.px-4.py-3.text-sm.text-gray-600.whitespace-nowrap
+              = letter.letter_date&.strftime("%-m/%-d/%Y") || "—"
+            td.px-4.py-3.text-sm.font-mono.text-blue-700
+              = letter.application_numbers.join(", ").presence || "—"
+            td.px-4.py-3.text-sm.text-gray-900 = letter.company_name
+            td.px-4.py-3.text-sm
+              = center_badges(letter.approver_center)
+            td.px-4.py-3.text-sm
+              - count = letter.corrections_count.to_i
+              - if count > 0
+                span.inline-flex.items-center.rounded-full.px-2.py-0.5.text-xs.font-medium.bg-amber-100.text-amber-700.border.border-amber-200
+                  = "#{count} correction#{"s" if count != 1}"
+              - else
+                span.text-gray-400 —
+            td.px-4.py-3.text-right
+              = link_to "Edit", edit_admin_complete_response_letter_path(letter),
+                  class: "text-sm text-blue-600 hover:underline"
+
+.mt-4== @pagy.series_nav
