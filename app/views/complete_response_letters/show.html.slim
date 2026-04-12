@@ -1,19 +1,14 @@
 = link_to "← Back to results", complete_response_letters_path, class: "text-sm text-blue-600 hover:underline"
 
+/ Metadata card
 .mt-4.bg-white.rounded-lg.border.border-gray-200.overflow-hidden
   / Header
   .px-4.sm:px-6.py-5.border-b.border-gray-200
-    .flex.flex-col.sm:flex-row.sm:items-start.sm:justify-between.gap-3
-      div
-        h1.text-xl.font-semibold.text-gray-900 = @letter.company_name
-        p.mt-1.text-sm.text-gray-500 = @letter.letter_type
-      - if @letter.file_name.present?
-        = link_to "View PDF →", "https://download.open.fda.gov/crl/#{@letter.file_name}",
-            target: "_blank", rel: "noopener noreferrer",
-            class: "self-start sm:flex-shrink-0 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+    h1.text-xl.font-semibold.text-gray-900 = @letter.company_name
+    p.mt-1.text-sm.text-gray-500 = @letter.letter_type
 
   / Metadata grid
-  dl.grid.grid-cols-1.sm:grid-cols-2.lg:grid-cols-3.gap-px.bg-gray-100.border-b.border-gray-200
+  dl.grid.grid-cols-1.sm:grid-cols-2.lg:grid-cols-3.gap-px.bg-gray-100
     .bg-white.px-4.py-4
       dt.text-xs.font-medium.text-gray-500.uppercase.tracking-wide Letter Date
       dd.mt-1.flex.items-center.flex-wrap.gap-1
@@ -51,15 +46,27 @@
 
   / Company address
   - if @letter.company_address.present?
-    .px-4.sm:px-6.py-4.border-b.border-gray-200
+    .px-4.sm:px-6.py-4.border-t.border-gray-100
       p.text-xs.font-medium.text-gray-500.uppercase.tracking-wide.mb-1 Company Address
       p.text-sm.text-gray-700.whitespace-pre-line = @letter.company_address
 
-  / Full letter text
-  .px-4.sm:px-6.py-5
-    h2.text-sm.font-semibold.text-gray-700.uppercase.tracking-wide.mb-3 Letter Text
-    - if @letter.text.present?
-      .max-h-96.overflow-y-auto.border.border-gray-100.rounded.p-4.bg-gray-50
-        p.text-sm.text-gray-800.whitespace-pre-wrap = @letter.text
-    - else
-      p.text-sm.text-gray-400.italic Full text not available
+/ PDF viewer — lives outside the metadata card, bleeds to the layout edges
+/ -mx-4 sm:-mx-6 lg:-mx-8 cancels the layout's own horizontal padding so the
+/ iframe fills the full viewport width (up to max-w-7xl on large screens).
+- if @letter.file_name.present?
+  .mt-4.-mx-4.sm:-mx-6.lg:-mx-8
+    .bg-white.border-y.border-gray-200
+      .px-4.sm:px-6.lg:px-8.py-3.flex.items-center.justify-between.border-b.border-gray-100
+        h2.text-sm.font-semibold.text-gray-700.uppercase.tracking-wide Document
+        = link_to "Open in new tab →",
+            pdf_complete_response_letter_path(@letter),
+            target: "_blank", rel: "noopener noreferrer",
+            class: "text-xs text-blue-600 hover:underline flex-shrink-0"
+      .px-3.sm:px-5.py-3.bg-gray-50
+        embed(src=pdf_complete_response_letter_path(@letter) type="application/pdf" class="w-full block" style="height: calc(100dvh - 220px); min-height: 400px;")
+- elsif @letter.text.present?
+  .mt-4.bg-white.rounded-lg.border.border-gray-200.px-4.sm:px-6.py-5
+    p.text-xs.text-gray-400.italic.mb-3
+      | No PDF available — showing the OCR text extracted from the document.
+    .max-h-96.overflow-y-auto.border.border-gray-100.rounded.p-4.bg-gray-50
+      p.text-sm.text-gray-800.whitespace-pre-wrap = @letter.text

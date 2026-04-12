@@ -10,7 +10,9 @@ Rails.application.routes.draw do
     
   devise_for :users, controllers: { registrations: "users/registrations" }
 
-  resources :complete_response_letters, only: [:index, :show]
+  resources :complete_response_letters, only: [:index, :show] do
+    member { get :pdf }
+  end
 
   namespace :admin do
     resources :complete_response_letters, only: [:index, :edit, :update], path: "letters"

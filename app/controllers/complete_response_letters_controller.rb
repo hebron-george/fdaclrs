@@ -1,3 +1,5 @@
+require "net/http"
+
 class CompleteResponseLettersController < ApplicationController
   CBER = "Center for Biologics Evaluation and Research"
 
@@ -41,5 +43,51 @@ class CompleteResponseLettersController < ApplicationController
 
   def show
     @letter = CompleteResponseLetter.includes(:letter_corrections).find(params[:id])
+  end
+
+  def pdf
+    letter = CompleteResponseLetter.find(params[:id])
+
+    unless letter.file_name.present?
+      head :not_found and return
+    end
+
+    data = fetch_fda_pdf(letter.file_name)
+
+    if data
+      send_data data, type: "application/pdf", disposition: "inline",
+                      filename: letter.file_name
+    else
+      head :not_found
+    end
+  end
+
+  private
+
+  # Fetches a PDF from the FDA CDN, following up to 3 redirects.
+  # Returns the raw binary string on success, nil on any failure.
+  def fetch_fda_pdf(file_name)
+    uri = URI("https://download.open.fda.gov/crl/#{file_name}")
+
+    3.times do
+      req = Net::HTTP::Get.new(uri)
+      response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
+                                 open_timeout: 10, read_timeout: 20) do |http|
+        http.request(req)
+      end
+
+      case response
+      when Net::HTTPSuccess
+        return response.body
+      when Net::HTTPRedirection
+        uri = URI(response["Location"])
+      else
+        return nil
+      end
+    end
+
+    nil
+  rescue SocketError, Net::OpenTimeout, Net::ReadTimeout, URI::InvalidURIError
+    nil
   end
 end
