@@ -1,12 +1,12 @@
 Rails.application.routes.draw do
   root "home#index"
-  mount PgHero::Engine, at: "/pghero"
+  require "sidekiq/web"
+  authenticate :user, ->(u) { u.admin? } do
+    mount Sidekiq::Web => "/sidekiq"
+    mount PgHero::Engine, at: "/pghero"
+  end
 
   post "/interactions", to: "ahoy/events#create"
-    
-
-  require "sidekiq/web"
-  mount Sidekiq::Web => "/sidekiq"
     
   devise_for :users, controllers: { registrations: "users/registrations" }
 
