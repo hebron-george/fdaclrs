@@ -45,7 +45,17 @@ class FdaCrlSyncJob
     SystemSetting.set("last_crl_sync_at", Time.current.iso8601)
     Rails.logger.info "[FdaCrlSyncJob] Sync complete. #{new_file_names.size} new record(s)."
 
-    NewCrlNotificationJob.perform_async(new_file_names) if new_file_names.any?
+    if new_file_names.any?
+      NewCrlNotificationJob.perform_async(new_file_names)
+
+      new_ids = CompleteResponseLetter
+        .where(file_name: new_file_names)
+        .where.not(text: [nil, ""])
+        .pluck(:id)
+
+      new_ids.each { |id| GenerateLetterSummaryJob.perform_async(id) }
+      Rails.logger.info "[FdaCrlSyncJob] Enqueued #{new_ids.size} summary job(s)."
+    end
 
     new_file_names
   end

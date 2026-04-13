@@ -15,7 +15,9 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
-    resources :complete_response_letters, only: [:index, :edit, :update], path: "letters"
+    resources :complete_response_letters, only: [:index, :edit, :update], path: "letters" do
+      member { post :regenerate_summary }
+    end
   end
   resources :subscriptions, only: [:index, :create, :destroy]
   get "/unsubscribe/:token", to: "subscriptions#unsubscribe", as: :unsubscribe

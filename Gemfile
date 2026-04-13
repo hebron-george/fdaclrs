@@ -73,6 +73,7 @@ gem "pry-rails"
 gem "awesome_print"
 gem "open_fda_api", github: "hebron-george/open_fda_api"
 gem "pagy"
+gem "anthropic"
 
 group :development, :test do
   gem "rspec-rails"
