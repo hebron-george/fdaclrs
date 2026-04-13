@@ -163,7 +163,9 @@ CREATE TABLE public.complete_response_letters (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     application_numbers character varying[] DEFAULT '{}'::character varying[],
-    approver_center character varying[] DEFAULT '{}'::character varying[]
+    approver_center character varying[] DEFAULT '{}'::character varying[],
+    summary text,
+    summary_generated_at timestamp(6) without time zone
 );
 
 
@@ -647,6 +649,7 @@ ALTER TABLE ONLY public.subscriptions
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260413115114'),
 ('20260411200002'),
 ('20260411200001'),
 ('20260411133415'),

@@ -18,6 +18,20 @@ module Admin
         .group_by(&:field_name)
     end
 
+    def regenerate_summary
+      @letter = CompleteResponseLetter.find(params[:id])
+
+      if @letter.text.blank?
+        redirect_to edit_admin_complete_response_letter_path(@letter),
+          alert: "This letter has no OCR text — cannot generate a summary."
+        return
+      end
+
+      GenerateLetterSummaryJob.perform_async(@letter.id, true)
+      redirect_to edit_admin_complete_response_letter_path(@letter),
+        notice: "Summary regeneration enqueued."
+    end
+
     def update
       @letter = CompleteResponseLetter.includes(:letter_corrections).find(params[:id])
 
