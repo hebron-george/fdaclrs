@@ -59,20 +59,16 @@
     .px-4.sm:px-6.py-4
       p.text-sm.text-gray-800.leading-relaxed = @letter.summary
 
-/ PDF viewer — lives outside the metadata card, bleeds to the layout edges
-/ -mx-4 sm:-mx-6 lg:-mx-8 cancels the layout's own horizontal padding so the
-/ iframe fills the full viewport width (up to max-w-7xl on large screens).
 - if @letter.file_name.present?
-  .mt-4.-mx-4.sm:-mx-6.lg:-mx-8
-    .bg-white.border-y.border-gray-200
-      .px-4.sm:px-6.lg:px-8.py-3.flex.items-center.justify-between.border-b.border-gray-100
-        h2.text-sm.font-semibold.text-gray-700.uppercase.tracking-wide Document
-        = link_to "Open in new tab →",
-            pdf_complete_response_letter_path(@letter),
-            target: "_blank", rel: "noopener noreferrer",
-            class: "text-xs text-blue-600 hover:underline flex-shrink-0"
-      .px-3.sm:px-5.py-3.bg-gray-50
-        embed(src=pdf_complete_response_letter_path(@letter) type="application/pdf" class="w-full block" style="height: calc(100dvh - 220px); min-height: 400px;")
+  .mt-4.bg-white.rounded-lg.border.border-gray-200.overflow-hidden
+    .px-4.sm:px-6.py-3.flex.items-center.justify-between.border-b.border-gray-200
+      h2.text-sm.font-semibold.text-gray-700.uppercase.tracking-wide Document
+      = link_to "Open in new tab →",
+          pdf_complete_response_letter_path(@letter),
+          target: "_blank", rel: "noopener noreferrer",
+          class: "text-xs text-blue-600 hover:underline flex-shrink-0"
+    .px-3.sm:px-5.py-3.bg-gray-50
+      embed(src=pdf_complete_response_letter_path(@letter) type="application/pdf" class="w-full block" style="height: calc(100dvh - 220px); min-height: 400px;")
 - elsif @letter.text.present?
   .mt-4.bg-white.rounded-lg.border.border-gray-200.px-4.sm:px-6.py-5
     p.text-xs.text-gray-400.italic.mb-3
