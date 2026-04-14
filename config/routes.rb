@@ -8,6 +8,11 @@ Rails.application.routes.draw do
 
   post "/interactions", to: "ahoy/events#create"
     
+  namespace :api do
+    get  "pending_summaries/next",   to: "pending_summaries#next_pending"
+    post "pending_summaries/submit", to: "pending_summaries#submit"
+  end
+
   devise_for :users, controllers: { registrations: "users/registrations" }
 
   resources :complete_response_letters, only: [:index, :show] do
