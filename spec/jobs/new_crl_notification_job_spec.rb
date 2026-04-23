@@ -57,4 +57,28 @@ RSpec.describe NewCrlNotificationJob, type: :job do
 
     expect { job.perform([letter.file_name]) }.to change { ActionMailer::Base.deliveries.count }.by(2)
   end
+
+  it "sends one email per letter-subscription match across multiple letters" do
+    letter1 = create_letter(company_name: "Alpha Pharma")
+    letter2 = create_letter(company_name: "Beta Biotech")
+    create_subscription(filters: { "company" => "alpha" })
+    create_subscription(filters: { "company" => "beta" })
+
+    expect {
+      job.perform([letter1.file_name, letter2.file_name])
+    }.to change { ActionMailer::Base.deliveries.count }.by(2)
+  end
+
+  it "does nothing when file_names are not found in the database" do
+    create_subscription(filters: {})
+
+    expect {
+      job.perform(["nonexistent_file.pdf"])
+    }.not_to change { ActionMailer::Base.deliveries.count }
+  end
+
+  it "does nothing when new_file_names is nil" do
+    create_subscription(filters: {})
+    expect { job.perform(nil) }.not_to change { ActionMailer::Base.deliveries.count }
+  end
 end
