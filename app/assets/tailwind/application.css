@@ -3,3 +3,35 @@
 @source "../../../app/views/**/*.slim";
 @source "../../../app/helpers/**/*.rb";
 @source "../../../app/javascript/**/*.js";
+
+@layer components {
+  nav.pagy.series-nav {
+    @apply flex flex-wrap items-center justify-center gap-1;
+  }
+
+  nav.pagy.series-nav a {
+    @apply inline-flex items-center justify-center min-w-8 h-8 px-2 text-sm rounded border border-gray-200 text-gray-600 no-underline transition-colors;
+    @apply hover:bg-gray-50 hover:border-gray-300;
+  }
+
+  nav.pagy.series-nav a[aria-current="page"] {
+    @apply bg-gray-900 text-white border-gray-900 font-medium cursor-default;
+    @apply hover:bg-gray-800 hover:border-gray-900;
+  }
+
+  nav.pagy.series-nav a[role="separator"] {
+    @apply border-transparent text-gray-400 cursor-default;
+    @apply hover:bg-transparent hover:border-transparent;
+  }
+
+  nav.pagy.series-nav a[aria-disabled="true"]:not([aria-current="page"]):not([role="separator"]) {
+    @apply text-gray-300 border-gray-100 cursor-not-allowed;
+    @apply hover:bg-transparent hover:border-gray-100;
+  }
+
+  @media (max-width: 640px) {
+    nav.pagy.series-nav a {
+      @apply min-w-7 h-7 px-1.5 text-xs;
+    }
+  }
+}
