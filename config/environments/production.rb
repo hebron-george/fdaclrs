@@ -58,15 +58,7 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "example.com") }
 
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    address:              ENV.fetch("SMTP_HOST", "smtp.example.com"),
-    port:                 ENV.fetch("SMTP_PORT", 587).to_i,
-    user_name:            ENV["SMTP_USER"],
-    password:             ENV["SMTP_PASS"],
-    authentication:       :plain,
-    enable_starttls_auto: true
-  }
+  config.action_mailer.delivery_method = :resend
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
