@@ -24,6 +24,20 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
 -- Name: complete_response_letters_search_vector_update(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -549,6 +563,13 @@ CREATE INDEX index_complete_response_letters_on_search_vector ON public.complete
 
 
 --
+-- Name: index_complete_response_letters_on_text_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_complete_response_letters_on_text_trgm ON public.complete_response_letters USING gin (text public.gin_trgm_ops);
+
+
+--
 -- Name: index_letter_corrections_on_complete_response_letter_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -649,6 +670,7 @@ ALTER TABLE ONLY public.subscriptions
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260505042030'),
 ('20260413115114'),
 ('20260411200002'),
 ('20260411200001'),

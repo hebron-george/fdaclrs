@@ -21,8 +21,11 @@ class CompleteResponseLetter < ApplicationRecord
     correction&.original_value
   end
   scope :search, ->(q) {
-    where("search_vector @@ plainto_tsquery('english', ?)", q)
-      .order(Arel.sql("ts_rank(search_vector, plainto_tsquery('english', #{connection.quote(q)})) DESC"))
+    quoted_q = connection.quote(q)
+    where(
+      "search_vector @@ plainto_tsquery('english', ?) OR text ILIKE ?",
+      q, "%#{q}%"
+    ).order(Arel.sql("ts_rank(search_vector, plainto_tsquery('english', #{quoted_q})) DESC"))
   }
 
   scope :by_application_number, ->(num) {
