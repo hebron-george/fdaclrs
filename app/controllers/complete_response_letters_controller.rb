@@ -34,10 +34,21 @@ class CompleteResponseLettersController < ApplicationController
 
     if params[:q].present? && @letters.any?
       quoted_q = ActiveRecord::Base.connection.quote(params[:q])
-      @headlines = CompleteResponseLetter
-        .where(id: @letters.map(&:id))
+      letter_ids = @letters.map(&:id)
+
+      fts_headlines = CompleteResponseLetter
+        .where(id: letter_ids)
+        .where("search_vector @@ plainto_tsquery('english', ?)", params[:q])
         .pluck(:id, Arel.sql("ts_headline('english', coalesce(text, ''), plainto_tsquery('english', #{quoted_q}), 'MaxWords=35, MinWords=15, StartSel=<mark>, StopSel=</mark>')"))
         .to_h
+
+      ilike_ids = letter_ids - fts_headlines.keys
+      ilike_headlines = CompleteResponseLetter
+        .where(id: ilike_ids)
+        .pluck(:id, :text)
+        .to_h { |id, text| [id, ilike_snippet(text, params[:q])] }
+
+      @headlines = fts_headlines.merge(ilike_headlines)
     end
   end
 
@@ -63,6 +74,16 @@ class CompleteResponseLettersController < ApplicationController
   end
 
   private
+
+  def ilike_snippet(text, q)
+    return "" if text.blank?
+    pos = text.downcase.index(q.downcase)
+    return ERB::Util.html_escape(text.first(200)) unless pos
+    start = [pos - 80, 0].max
+    raw_snippet = text[start, 200] || ""
+    ERB::Util.html_escape(raw_snippet)
+              .gsub(/#{Regexp.escape(ERB::Util.html_escape(q))}/i, '<mark>\0</mark>')
+  end
 
   # Fetches a PDF from the FDA CDN, following up to 3 redirects.
   # Returns the raw binary string on success, nil on any failure.

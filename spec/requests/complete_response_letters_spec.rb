@@ -70,6 +70,41 @@ RSpec.describe "CompleteResponseLetters", type: :request do
       get complete_response_letters_path, params: { q: "zzznomatch", center: "" }
       expect(response.body).to include("No letters found")
     end
+
+    it "finds records via substring search (ILIKE path)" do
+      create_letter(
+        company_name: "AAV Genomics",
+        approver_center: ["Center for Biologics Evaluation and Research"],
+        text: "The product onasemnogene abeparvovec was reviewed for safety."
+      )
+
+      get complete_response_letters_path, params: { q: "parvovec", center: "" }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("AAV Genomics")
+    end
+
+    it "renders a highlighted snippet for ILIKE-matched records" do
+      create_letter(
+        company_name: "AAV Genomics",
+        approver_center: ["Center for Biologics Evaluation and Research"],
+        text: "The product onasemnogene abeparvovec was reviewed for safety."
+      )
+
+      get complete_response_letters_path, params: { q: "parvovec", center: "" }
+      expect(response.body).to include("<mark>parvovec</mark>")
+    end
+
+    it "escapes HTML in query string to prevent XSS via ILIKE snippet" do
+      create_letter(
+        company_name: "AAV Genomics",
+        approver_center: ["Center for Biologics Evaluation and Research"],
+        text: "This letter discusses <script>alert(1)</script> safety concerns."
+      )
+
+      get complete_response_letters_path, params: { q: "<script>", center: "" }
+      expect(response.body).not_to include("<script>alert(1)</script>")
+      expect(response.body).to include("&lt;script&gt;")
+    end
   end
 
   describe "GET /complete_response_letters/:id" do

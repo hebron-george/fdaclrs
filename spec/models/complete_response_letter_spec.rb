@@ -59,6 +59,39 @@ RSpec.describe CompleteResponseLetter, type: :model do
       results = CompleteResponseLetter.search("BLA125012")
       expect(results.map(&:file_name)).to include("gene_therapy.pdf")
     end
+
+    it "matches a substring that is not a standalone word (ILIKE path)" do
+      build_letter(
+        file_name: "aav_therapy.pdf",
+        text:      "The product onasemnogene abeparvovec was reviewed for safety."
+      )
+      results = CompleteResponseLetter.search("parvovec")
+      expect(results.map(&:file_name)).to include("aav_therapy.pdf")
+    end
+
+    it "does not return unrelated records on substring search" do
+      build_letter(
+        file_name: "aav_therapy.pdf",
+        text:      "The product onasemnogene abeparvovec was reviewed for safety."
+      )
+      results = CompleteResponseLetter.search("parvovec")
+      expect(results.map(&:file_name)).not_to include("small_molecule.pdf")
+    end
+
+    it "returns FTS results alongside ILIKE results when both apply" do
+      build_letter(
+        file_name: "aav_therapy.pdf",
+        text:      "The product onasemnogene abeparvovec was reviewed for safety."
+      )
+      # "lentiviral" is a whole word (FTS path); "parvovec" is a suffix (ILIKE path)
+      # searching for a term that matches only one of them should return only that one
+      fts_results   = CompleteResponseLetter.search("lentiviral")
+      ilike_results = CompleteResponseLetter.search("parvovec")
+      expect(fts_results.map(&:file_name)).to include("gene_therapy.pdf")
+      expect(fts_results.map(&:file_name)).not_to include("aav_therapy.pdf")
+      expect(ilike_results.map(&:file_name)).to include("aav_therapy.pdf")
+      expect(ilike_results.map(&:file_name)).not_to include("gene_therapy.pdf")
+    end
   end
 
   describe ".by_application_number scope" do
